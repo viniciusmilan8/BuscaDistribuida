@@ -1,0 +1,60 @@
+version: "3.5"
+
+services:
+  api_1:
+    container_name: api_1
+    hostname: api_1
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./:/app/:z
+    env_file: 
+      - ./endpoint_api_1.env
+    networks:
+      - dsd-net
+
+  api_2:
+    container_name: api_2
+    hostname: api_2
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./:/app/:z
+    env_file:
+      - ./endpoint_api_2.env
+    networks:
+      - dsd-net
+
+  api_3:
+    container_name: api_3
+    hostname: api_3
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8004:8000"
+    volumes:
+      - ./:/app/:z
+    env_file:
+      - ./endpoint_api_3.env
+    networks:
+      - dsd-net
+
+  mongodb:
+    container_name: mongodb
+    hostname: mongodb
+    image: mongo:4.2
+    ports:
+      - "27017:27017"
+    networks:
+      - dsd-net
+
+networks:
+  dsd-net:
+    driver: bridge
