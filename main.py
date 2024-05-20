@@ -9,15 +9,18 @@ from functools import lru_cache
 class Environment(BaseSettings):
     database_name: str
     mongo_uri: str
-    vizinhos: str  # String JSON dos vizinhos
+    vizinhos: str
 
     class Config:
         env_file = ".env"
 
     @property
     def neighbor_list(self):
-        # Converte a string JSON em lista Python
         return json.loads(self.vizinhos.replace("'", '"'))
+    
+    @property
+    def total_neighbors(self):
+        return len(self.neighbor_list)
 
 app = FastAPI()
 
@@ -38,7 +41,6 @@ def get_document(_id: str):
     
     if document:
         print(f"Document found locally: {document}")
-        # Retorna o documento se encontrado localmente
         return json_util.loads(json_util.dumps(document))
     else:
         print(f"Document with _id: {_id} not found in local database")
@@ -58,7 +60,8 @@ def get_document(_id: str, depth: int = 0):
     if document:
         print(f"Document found locally: {document}")
         return json_util.loads(json_util.dumps(document))
-    elif depth < 3:  # Limita a profundidade para evitar loops infinitos
+    elif depth < env.total_neighbors:
+        print(f"total: {env.total_neighbors}.")
         print(f"Document not found locally. Searching in neighbors with depth {depth}.")
         return fetch_from_neighbors(env.neighbor_list, _id, depth + 1)
     else:
